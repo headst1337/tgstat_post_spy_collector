@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Dashboard</h1>
+    {% for post in posts %}
+    <div>
+        <p>{{ entry.body }}</p>
+        <p><small>{{ post.timestamp }}</small></p>
+    </div>
+    {% endfor %}
+{% endblock %}
