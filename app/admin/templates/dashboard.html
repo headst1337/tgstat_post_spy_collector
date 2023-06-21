@@ -1,9 +1,193 @@
-{% block content %}
-    <h1>Dashboard</h1>
-    {% for post in posts %}
-    <div>
-        <p>{{ entry.body }}</p>
-        <p><small>{{ post.timestamp }}</small></p>
+<script>
+    document.getElementById("date").addEventListener("change", function() {
+        var selectedDate = this.value;
+        var showByDateButton = document.querySelector("button[name='filter'][value='calendar']");
+        showByDateButton.disabled = !selectedDate;
+    });
+</script>
+
+<style>
+    body {
+        background-color: #111;
+        color: #fff;
+        font-family: monospace;
+        padding: 20px;
+    }
+
+    h1 {
+        color: #00ff00;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #aaa;
+        word-break: break-word;  /* Added to enable line breaks in table cells */
+    }
+
+    th {
+        background-color: #333;
+    }
+
+    tr:nth-child(even) {
+        background-color: #222;
+    }
+
+    a.button {
+        color: #fff;
+        margin-right: 10px;
+        padding: 10px 20px;
+        background-color: #222;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+
+    a.button:hover {
+        background-color: #00ff00;
+    }
+
+    a.button.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .pagination {
+        margin-bottom: 20px;
+    }
+
+    .pagination a {
+        color: #00ff00;
+        margin-right: 5px;
+        padding: 6px 10px;
+        background-color: #222;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        text-decoration: none;
+    }
+
+    .pagination a.current {
+        background-color: #00ff00;
+        color: #111;
+    }
+
+    .date-container {
+        margin-bottom: 10px;
+    }
+
+    .date-container label {
+        color: #fff;
+        margin-right: 10px;
+    }
+
+    .date-container input[type="date"] {
+        padding: 5px;
+        border-radius: 4px;
+        border: 1px solid #aaa;
+        background-color: #222;
+        color: #fff;
+    }
+
+    .date-container button {
+        padding: 5px 10px;
+        border-radius: 4px;
+        border: none;
+        background-color: #222;
+        color: #fff;
+        font-size: 14px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .date-container button:hover {
+        background-color: #00ff00;
+    }
+
+    .date-container button.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+</style>
+
+<h1>Dashboard</h1>
+
+<form method="get" action="{{ url_for('admin.dashboard') }}">
+    <div class="date-container">
+        <label for="date">Select Date:</label>
+        <input type="date" id="date" name="date">
+        <button class="button" type="submit" name="filter" value="calendar" {% if not date %}disabled{% endif %}>Show by Date</button>
+        <button class="button" type="submit" name="filter" value="pagination">Show All</button>
+        
     </div>
-    {% endfor %}
-{% endblock %}
+</form>
+
+{% if filter == 'calendar' and date %}
+    <script>
+        document.getElementById("date").value = "{{ date }}";
+    </script>
+{% endif %}
+
+{% if posts %}
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Post Link</th>
+            <th>Group Link</th>
+            <th>Body</th>
+            <th>Payment Data</th>
+            <th>Timestamp</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for post in posts.items %}
+            <tr>
+                <td>{{ post.id }}</td>
+                <td>{{ post.post_link }}</td>
+                <td>{{ post.group_link }}</td>
+                <td class="body-text">{{ post.body }}</td>
+                <td>{{ post.payment_data }}</td>
+                <td>{{ post.timestamp }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        {% if posts.has_prev %}
+            <a class="button" href="{{ url_for('admin.dashboard', page=posts.prev_num, filter=filter, date=date) }}">Previous</a>
+        {% else %}
+            <a class="button disabled">Previous</a>
+        {% endif %}
+
+        {% for num in posts.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+            {% if num %}
+                {% if num != posts.page %}
+                    <a href="{{ url_for('admin.dashboard', page=num, filter=filter, date=date) }}" {% if num == posts.page %}class="current"{% endif %}>{{ num }}</a>
+                {% else %}
+                    <a class="button disabled">{{ num }}</a>
+                {% endif %}
+            {% else %}
+                <span class="current">{{ posts.page }}</span>
+            {% endif %}
+        {% endfor %}
+
+        {% if posts.has_next %}
+            <a class="button" href="{{ url_for('admin.dashboard', page=posts.next_num, filter=filter, date=date) }}">Next</a>
+        {% else %}
+            <a class="button disabled">Next</a>
+        {% endif %}
+    </div>
+{% endif %}
