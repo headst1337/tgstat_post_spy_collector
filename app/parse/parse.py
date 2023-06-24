@@ -21,7 +21,10 @@ from ..config import Config
 def extract_payment_data(text: str) -> str:
     pattern = r'\b\d{16}\b'
     matches = re.findall(pattern, text)
-    return matches[0]
+    if matches.count() > 0:
+        return matches[0]
+    else:
+        return None
 
 async def fetch_from_api(session, offset, limit):
     end_date = int(time.time())  # Текущая дата в формате timestamp
@@ -58,7 +61,7 @@ async def fetch_data():
     async with aiohttp.ClientSession() as session:
         tasks = []
         limit = 50
-        for offset in range(0, 101, limit):
+        for offset in range(0, 100):
             task = asyncio.ensure_future(fetch_from_api(session, offset, limit))
             tasks.append(task)
         await asyncio.gather(*tasks)
