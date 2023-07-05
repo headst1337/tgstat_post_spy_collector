@@ -1,11 +1,3 @@
-<script>
-    document.getElementById("date").addEventListener("change", function() {
-        var selectedDate = this.value;
-        var showByDateButton = document.querySelector("button[name='filter'][value='calendar']");
-        showByDateButton.disabled = !selectedDate;
-    });
-</script>
-
 <style>
     body {
         background-color: #111;
@@ -63,28 +55,9 @@
         pointer-events: none;
     }
 
-    .pagination {
-        margin-bottom: 20px;
-    }
-
-    .pagination a {
-        color: #00ff00;
-        margin-right: 5px;
-        padding: 6px 10px;
-        background-color: #222;
-        border: none;
-        border-radius: 4px;
-        font-size: 14px;
-        text-decoration: none;
-    }
-
-    .pagination a.current {
-        background-color: #00ff00;
-        color: #111;
-    }
-
     .date-container {
         margin-bottom: 10px;
+        display: inline-block;
     }
 
     .date-container label {
@@ -119,6 +92,28 @@
         opacity: 0.5;
         pointer-events: none;
     }
+
+    .download-button {
+        display: inline-block;
+        color: #fff;
+        margin-right: 10px;
+        padding: 10px 20px;
+        background-color: #222;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .download-button:hover {
+        background-color: #00ff00;
+    }
+
+    .download-button.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
 </style>
 
 <h1>Dashboard</h1>
@@ -127,17 +122,14 @@
     <div class="date-container">
         <label for="date">Select Date:</label>
         <input type="date" id="date" name="date">
-        <button class="button" type="submit" name="filter" value="calendar" {% if not date %}disabled{% endif %}>Show by Date</button>
-        <button class="button" type="submit" name="filter" value="pagination">Show All</button>
-        
+        <button class="button" type="submit">Show by date</button>
     </div>
 </form>
 
-{% if filter == 'calendar' and date %}
-    <script>
-        document.getElementById("date").value = "{{ date }}";
-    </script>
-{% endif %}
+<form method="get" action="{{ url_for('admin.download') }}">
+    <input type="hidden" name="date" value="{{ request.args.get('date') }}">
+    <button class="button download-button" type="submit">Download</button>
+</form>
 
 {% if posts %}
     <table>
@@ -152,7 +144,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for post in posts.items %}
+        {% for post in posts %}
             <tr>
                 <td>{{ post.id }}</td>
                 <td>{{ post.post_link }}</td>
@@ -164,30 +156,4 @@
         {% endfor %}
         </tbody>
     </table>
-
-    <div class="pagination">
-        {% if posts.has_prev %}
-            <a class="button" href="{{ url_for('admin.dashboard', page=posts.prev_num, filter=filter, date=date) }}">Previous</a>
-        {% else %}
-            <a class="button disabled">Previous</a>
-        {% endif %}
-
-        {% for num in posts.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
-            {% if num %}
-                {% if num != posts.page %}
-                    <a href="{{ url_for('admin.dashboard', page=num, filter=filter, date=date) }}" {% if num == posts.page %}class="current"{% endif %}>{{ num }}</a>
-                {% else %}
-                    <a class="button disabled">{{ num }}</a>
-                {% endif %}
-            {% else %}
-                <span class="current">{{ posts.page }}</span>
-            {% endif %}
-        {% endfor %}
-
-        {% if posts.has_next %}
-            <a class="button" href="{{ url_for('admin.dashboard', page=posts.next_num, filter=filter, date=date) }}">Next</a>
-        {% else %}
-            <a class="button disabled">Next</a>
-        {% endif %}
-    </div>
 {% endif %}
