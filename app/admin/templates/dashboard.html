@@ -16,13 +16,21 @@
         width: 100%;
         border-collapse: collapse;
         margin-bottom: 20px;
+        table-layout: fixed;
     }
 
     th, td {
         padding: 10px;
         text-align: left;
-        border-bottom: 1px solid #aaa;
-        word-break: break-word;  /* Added to enable line breaks in table cells */
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        word-break: break-word;
+        white-space: normal;
+        border-right: 1px solid rgba(255, 255, 255, 0.1); /* Добавлено для вертикальных разделителей */
+    }
+
+    th:last-child,
+    td:last-child {
+        border-right: none; /* Удаление правого разделителя для последнего столбца */
     }
 
     th {
@@ -120,15 +128,15 @@
 
 <form method="get" action="{{ url_for('admin.dashboard') }}">
     <div class="date-container">
-        <label for="date">Select Date:</label>
+        <label for="date">Выберите дату:</label>
         <input type="date" id="date" name="date">
-        <button class="button" type="submit">Show by date</button>
+        <button class="button" type="submit">Поиск по дате</button>
     </div>
 </form>
 
 <form method="get" action="{{ url_for('admin.download') }}">
     <input type="hidden" name="date" value="{{ request.args.get('date') }}">
-    <button class="button download-button" type="submit">Download</button>
+    <button class="button download-button" type="submit">Скачать</button>
 </form>
 
 {% if posts %}
@@ -136,11 +144,10 @@
         <thead>
         <tr>
             <th>ID</th>
-            <th>Post Link</th>
-            <th>Group Link</th>
-            <th>Body</th>
-            <th>Payment Data</th>
-            <th>Timestamp</th>
+            <th>Ссылка на пост</th>
+            <th>Ссылка на группу</th>
+            <th>Публикация</th>
+            <th>Платежные данные</th>
         </tr>
         </thead>
         <tbody>
@@ -151,7 +158,6 @@
                 <td>{{ post.group_link }}</td>
                 <td class="body-text">{{ post.body }}</td>
                 <td>{{ post.payment_data }}</td>
-                <td>{{ post.timestamp }}</td>
             </tr>
         {% endfor %}
         </tbody>
