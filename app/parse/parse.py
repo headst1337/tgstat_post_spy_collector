@@ -68,7 +68,7 @@ def save_object(post) -> None:
 def fetch_data() -> None:
     with requests.Session() as session:
         unique_offset = set()
-        for _ in range(1):
+        for _ in range(100):
             random_offset = random.randint(0, 1000)
             while random_offset in unique_offset:
                 random_offset = random.randint(0, 1000)
