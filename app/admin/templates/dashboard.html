@@ -157,7 +157,7 @@
                 <td>{{ post.post_link }}</td>
                 <td>{{ post.group_link }}</td>
                 <td class="body-text">{{ post.body }}</td>
-                <td>{{ post.payment_data }}</td>
+                <td>{{ post.payment_data|replace('\n', '<br>')|safe }}</td>
             </tr>
         {% endfor %}
         </tbody>

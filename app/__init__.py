@@ -19,6 +19,9 @@ def create_app(config_class=Config):
     from .admin import bp as admin_bp
     app.register_blueprint(admin_bp)
 
+    from .scheduler import bp as scheduler_bp
+    app.register_blueprint(scheduler_bp)
+
     with app.app_context():
         db.create_all()
 
@@ -29,13 +32,3 @@ from . models.user import User
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
-
-from app.parse.parse import fetch_data
-from apscheduler.schedulers.background import BackgroundScheduler
-
-scheduler = BackgroundScheduler()
-scheduler.add_job(fetch_data, trigger="interval", days=3)
-scheduler.start()
-
-fetch_data()

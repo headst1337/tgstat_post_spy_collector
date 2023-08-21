@@ -2,12 +2,13 @@ import datetime
 import re
 import requests
 import random
-from urllib.parse import urlencode
 
 from run import app
 from app import db
 from app.models.post import Post
 from app.config import Config
+
+from urllib.parse import urlencode
 
 
 def extract_filtered_data(text: str) -> str|None:
@@ -18,17 +19,18 @@ def extract_filtered_data(text: str) -> str|None:
 
     patterns = [crypto_pattern, mono_link_pattern, card_pattern]
 
-    result_data = ''
+    result_data = []
 
     for pattern in patterns:
         matches = re.findall(pattern, text)
         if matches:
-            result_data += '\n'.join(matches)
-    
-    if result_data:
-        result_data = '\n'.join(list(dict.fromkeys(result_data.split())))
+            for match in matches:
+                if isinstance(match, tuple):
+                    result_data.extend(match)
+                else:
+                    result_data.append(match)
 
-    return result_data if result_data else None
+    return '\n'.join(list(dict.fromkeys(result_data))) if result_data else None
 
 def fetch_from_api(session, offset) -> None:
     base_url = 'https://api.tgstat.ru/posts/search'
@@ -83,5 +85,3 @@ def fetch_data() -> None:
                 unique_offset.add(random_offset)
             print(f"Iter: {i} | Offset: {random_offset}")
             fetch_from_api(session, random_offset)
-
-
