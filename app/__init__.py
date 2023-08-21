@@ -30,6 +30,12 @@ from . models.user import User
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-from app.parse.parse import scheduler
+
+from app.parse.parse import fetch_data
+from apscheduler.schedulers.background import BackgroundScheduler
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(fetch_data, trigger="interval", days=3)
 scheduler.start()
 
+fetch_data()

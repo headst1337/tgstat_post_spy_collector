@@ -1,19 +1,14 @@
 import os
-import pymysql
-import urllib.parse
+from dotenv import load_dotenv
 
+
+load_dotenv()
 
 class Config(object):
-
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'secret'
-
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    TGSTAT_TOKEN = os.environ.get('TGSTAT_TOKEN')
+    KEYWORDS = os.environ.get('KEYWORDS')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+    ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME')
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-    TGSTAT_TOKEN = os.environ.get('TGSTAT_TOKEN') or 'tokentokentokentokentokentokento'
-
-    KEYWORDS = '(word|word2) -(banword1|banword2)'
-
-    password = urllib.parse.quote_plus('db_password')
-
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        f'mysql+pymysql://username:password@127.0.0.1/db_name'
