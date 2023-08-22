@@ -5,11 +5,11 @@ from app.parse.parse import fetch_data
 
 def start_scheduler():
     print("Scheduler started!")
+    fetch_data()
     scheduler = BackgroundScheduler()
     scheduler.add_job(
         fetch_data,
         trigger='interval',
-        seconds=15,
-        start_date=datetime.now(),
+        days=3
     )
     scheduler.start()
